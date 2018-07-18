@@ -1,0 +1,15 @@
+Branch zzz-batch
+("zzz" to move it to the bottom of the list)
+PoC for executing commands as batch.
+
+PRO:
+* previously, batch mode is not supported
+
+CON:
+* the salt-api does not have facilities for incremental reporting
+  user still has to wait until everything is done
+* the results are returned individually or grouped in the jobs list
+  there is no correlation, so it is hard to bundle the results later for presentation
+
+VERDICT:
+Keep until there is an actual request for it

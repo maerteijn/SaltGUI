@@ -131,11 +131,11 @@ export class DropDownMenu {
     this.menuButton.innerText = DropDownMenu._sanitizeMenuItemTitle(pTitle + " " + Character.BLACK_DOWN_POINTING_TRIANGLE);
   }
 
-  __showMenu () {
+  showMenu () {
     this.menuDropdown.style.display = "inline-block";
   }
 
-  __hideMenu () {
+  hideMenu () {
     this.menuDropdown.style.display = "none";
   }
 
