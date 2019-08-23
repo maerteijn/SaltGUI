@@ -1,26 +1,19 @@
 /* global document */
 
 import {Character} from "./Character.js";
-import {Documentation} from "./Documentation.js";
-import {DropDownMenu} from "./DropDown.js";
-import {Output} from "./output/Output.js";
-import {ParseCommandLine} from "./ParseCommandLine.js";
-import {Router} from "./Router.js";
-import {RunType} from "./RunType.js";
-import {TargetType} from "./TargetType.js";
-import {Utils} from "./Utils.js";
+import {Documentation} from "../Documentation.js";
+import {DropDownMenu} from "../DropDown.js";
+import {Output} from "../output/Output.js";
+import {Page} from "./Page.js";
+import {ParseCommandLine} from "../ParseCommandLine.js";
+import {RunType} from "../RunType.js";
+import {TargetType} from "../TargetType.js";
+import {Utils} from "../Utils.js";
 
-export class CommandBox {
+export class CmdPage extends Page {
 
-  constructor (pRouter, pApi) {
-    this.router = pRouter;
-    this.api = pApi;
-
-    const cmdbox = document.getElementById("cmd-box");
-    this.cmdmenu = new DropDownMenu(cmdbox);
-
-    this.documentation = new Documentation(this.router, this);
-    this._registerCommandBoxEventListeners();
+  constructor (pRouter) {
+    super("cmd", "Cmd", "page-cmd", "", pRouter);
 
     RunType.createMenu();
     TargetType.createMenu();
@@ -29,8 +22,10 @@ export class CommandBox {
     Utils.addTableHelp(manualRun, "Click for help", "bottom-center");
     const helpButton = manualRun.querySelector("#help");
     helpButton.addEventListener("click", () => {
-      CommandBox._showHelp();
+      CmdPage._showHelp();
     });
+
+    this._registerCmdPageEventListeners();
   }
 
   static _populateTemplateMenu () {
@@ -53,7 +48,7 @@ export class CommandBox {
       menu.addMenuItem(
         description,
         () => {
-          CommandBox._applyTemplate(template);
+          CmdPage._applyTemplate(template);
         }
       );
     }
@@ -123,30 +118,70 @@ export class CommandBox {
     output.innerHTML = txt;
   }
 
-  _registerCommandBoxEventListeners () {
-    document.getElementById("popup-run-command").
-      addEventListener("click", (pClickEvent) => CommandBox._hideManualRun(pClickEvent));
-    document.getElementById("button-manual-run").
-      addEventListener("click", (pClickEvent) => CommandBox.showManualRun(pClickEvent, this.api));
-    document.getElementById("cmd-close-button").
-      addEventListener("click", (pClickEvent) => CommandBox._hideManualRun(pClickEvent));
+  _registerCmdPageEventListeners () {
+    const targetField = this.pageElement.querySelector("#target");
+    TargetType.autoSelectTargetType(targetField.value);
+    this._addKeyEventListener("#target", () => {
+      const targetType = targetField.value;
+      TargetType.autoSelectTargetType(targetType);
+    });
+
+    const commandField = this.pageElement.querySelector("#command");
+
+    const cmdbox = this.pageElement.querySelector("#cmd-box");
+    this.cmdmenu = new DropDownMenu(cmdbox);
+    this._addKeyEventListener("#command", this.cmdmenu.verifyAll);
+    this.documentation = new Documentation(this);
 
     document.querySelector(".run-command input[type='submit']").
       addEventListener("click", () => {
         this._onRun();
       });
 
-    document.getElementById("target").
-      addEventListener("input", () => {
-        const targetField = document.getElementById("target");
-        const targetType = targetField.value;
-        TargetType.autoSelectTargetType(targetType);
-      });
+    RunType.setRunTypeDefault();
 
-    document.getElementById("command").
-      addEventListener("input", () => {
-        this.cmdmenu.verifyAll();
-      });
+    const outputField = this.pageElement.querySelector("pre");
+    outputField.innerText = "Waiting for command...";
+
+    // (re-)populate the dropdown box
+    const targetList = document.getElementById("data-list-target");
+    while (targetList.firstChild) {
+      targetList.removeChild(targetList.firstChild);
+    }
+    const nodeGroups = JSON.parse(window.localStorage.getItem("nodegroups"));
+    if (nodeGroups) {
+      for (const nodeGroup of Object.keys(nodeGroups).sort()) {
+        const option = document.createElement("option");
+        option.value = "#" + nodeGroup;
+        targetList.appendChild(option);
+      }
+    }
+    const minions = JSON.parse(window.localStorage.getItem("minions"));
+    if (minions) {
+      for (const minionId of minions.sort()) {
+        const option = document.createElement("option");
+        option.value = minionId;
+        targetList.appendChild(option);
+      }
+    }
+
+    // give another field (which does not have a list) focus first
+    // because when a field gets focus 2 times in a row,
+    // the dropdown box opens, and we don't want that...
+    commandField.focus();
+    targetField.focus();
+  }
+
+  _addKeyEventListener (selector, func) {
+    // keydown is too early, keypress also does not work
+    const field = this.pageElement.querySelector(selector);
+    field.addEventListener("keyup", func);
+    // cut/paste do not work everywhere
+    field.addEventListener("cut", func);
+    field.addEventListener("paste", func);
+    // blur/focus should not be needed but are a valuable fallback
+    field.addEventListener("blur", func);
+    field.addEventListener("focus", func);
   }
 
   static _applyTemplate (template) {
@@ -160,10 +195,10 @@ export class CommandBox {
         // we don't support that, revert to standard (not default)
         targetType = "glob";
       }
-      TargetType.setTargetType(targetType);
+      this.targetType.setTargetType(targetType);
     } else {
       // not in the template, revert to default
-      TargetType.setTargetTypeDefault();
+      this.targetType.setTargetTypeDefault();
     }
 
     if (template.target) {
@@ -178,12 +213,27 @@ export class CommandBox {
     }
   }
 
+  _onRunReturn (pResponse, pCommand) {
+    const outputContainer = this.pageElement.querySelector("pre");
+    let minions = Object.keys(pResponse);
+    if (pCommand.startsWith("runners.")) {
+      minions = ["RUNNER"];
+    }
+    if (pCommand.startsWith("wheel.")) {
+      minions = ["WHEEL"];
+    }
+    // do not suppress the jobId (even when we can)
+    Output.addResponseOutput(outputContainer, null, minions, pResponse, pCommand, "done");
+    const button = this.pageElement.querySelector("input[type='submit']");
+    button.disabled = false;
+  }
+
   _onRun () {
-    const button = document.querySelector(".run-command input[type='submit']");
+    const button = document.getElementById("run-command");
     if (button.disabled) {
       return;
     }
-    const output = document.querySelector(".run-command pre");
+    const output = this.pageElement.querySelector("pre");
 
     const targetField = document.getElementById("target");
     const targetValue = targetField.value;
@@ -196,7 +246,7 @@ export class CommandBox {
     const commandValueNoTabs = commandValue.replace(patWhitespaceAll, " ");
     if (commandValueNoTabs !== commandValue) {
       commandField.value = commandValueNoTabs;
-      CommandBox._showError("The command contains unsupported whitespace characters.\nThese have now been replaced by regular space characters.\nUse 'Run command' again to run the updated command.");
+      CmdPage._showError("The command contains unsupported whitespace characters.\nThese have now been replaced by regular space characters.\nUse 'Run command' again to run the updated command.");
       return;
     }
 
@@ -267,20 +317,20 @@ export class CommandBox {
 
     func.then((pResponse) => {
       if (pResponse) {
-        CommandBox.onRunReturn(pResponse.return[0], commandValue);
-        CommandBox._prepareForAsyncResults(pResponse);
+        CmdPage.onRunReturn(pResponse.return[0], commandValue);
+        CmdPage._prepareForAsyncResults(pResponse);
       } else {
-        CommandBox._showError("null response");
+        CmdPage._showError("null response");
       }
       return true;
     }, (pResponse) => {
-      CommandBox._showError(JSON.stringify(pResponse));
+      CmdPage._showError(JSON.stringify(pResponse));
       return false;
     });
   }
 
   static onRunReturn (pResponse, pCommand) {
-    const outputContainer = document.querySelector(".run-command pre");
+    const outputContainer = this.getPageElement().querySelector("pre");
     let minions = Object.keys(pResponse);
     if (pCommand.startsWith("runners.")) {
       minions = ["RUNNER"];
@@ -291,7 +341,7 @@ export class CommandBox {
     Output.addResponseOutput(outputContainer, null, minions, pResponse, pCommand, "done");
     const targetField = document.getElementById("target");
     const commandField = document.getElementById("command");
-    const button = document.querySelector(".run-command input[type='submit']");
+    const button = document.getElementById("run-command");
     targetField.disabled = false;
     commandField.disabled = false;
     button.disabled = false;
@@ -308,14 +358,14 @@ export class CommandBox {
     TargetType.autoSelectTargetType(targetField.value);
     targetField.onkeyup = (keyUpEvent) => {
       if (keyUpEvent.key === "Escape") {
-        CommandBox._hideManualRun(keyUpEvent);
+        CmdPage._hideManualRun(keyUpEvent);
       }
     };
 
     const commandField = document.getElementById("command");
     commandField.onkeyup = (keyUpEvent) => {
       if (keyUpEvent.key === "Escape") {
-        CommandBox._hideManualRun(keyUpEvent);
+        CmdPage._hideManualRun(keyUpEvent);
       }
     };
 
@@ -346,7 +396,7 @@ export class CommandBox {
     commandField.focus();
     targetField.focus();
 
-    CommandBox._populateTemplateMenu();
+    CmdPage._populateTemplateMenu();
 
     pClickEvent.stopPropagation();
 
@@ -381,7 +431,7 @@ export class CommandBox {
   }
 
   static _showError (pMessage) {
-    CommandBox.onRunReturn("ERROR:\n\n" + pMessage, "");
+    CmdPage.onRunReturn("ERROR:\n\n" + pMessage, "");
   }
 
   getRunParams (pTargetType, pTarget, pToRun, pisRunTypeNormalOnly = false) {
@@ -392,7 +442,7 @@ export class CommandBox {
     }
 
     if (pToRun === "") {
-      CommandBox._showError("'Command' field cannot be empty");
+      CmdPage._showError("'Command' field cannot be empty");
       return null;
     }
 
@@ -405,19 +455,19 @@ export class CommandBox {
     const ret = ParseCommandLine.parseCommandLine(pToRun, argsArray, argsObject);
     if (ret !== null) {
       // that is an error message being returned
-      CommandBox._showError(ret);
+      CmdPage._showError(ret);
       return null;
     }
 
     if (argsArray.length === 0) {
-      CommandBox._showError("First (unnamed) parameter is the function name, it is mandatory");
+      CmdPage._showError("First (unnamed) parameter is the function name, it is mandatory");
       return null;
     }
 
     const functionToRun = argsArray.shift();
 
     if (typeof functionToRun !== "string") {
-      CommandBox._showError("First (unnamed) parameter is the function name, it must be a string, not a " + typeof functionToRun);
+      CmdPage._showError("First (unnamed) parameter is the function name, it must be a string, not a " + typeof functionToRun);
       return null;
     }
 
@@ -426,7 +476,7 @@ export class CommandBox {
     // but we use the TARGET value to form the usually required MATCH parameter
     // therefore for WHEEL commands it is still required
     if (pTarget === "" && functionToRun !== "runners" && !functionToRun.startsWith("runners.")) {
-      CommandBox._showError("'Target' field cannot be empty");
+      CmdPage._showError("'Target' field cannot be empty");
       return null;
     }
 
@@ -436,7 +486,7 @@ export class CommandBox {
       const nodeGroupsTxt = Utils.getStorageItem("session", "nodegroups", "{}");
       const nodeGroups = JSON.parse(nodeGroupsTxt);
       if (!(pTarget in nodeGroups)) {
-        CommandBox._showError("Unknown nodegroup '" + pTarget + "'");
+        CmdPage._showError("Unknown nodegroup '" + pTarget + "'");
         return null;
       }
     }
@@ -460,7 +510,7 @@ export class CommandBox {
       params.fun = functionToRun.substring(6);
       params.match = pTarget;
       if (argsArray.length > 0) {
-        CommandBox._showError("Wheel commands can only take named parameters");
+        CmdPage._showError("Wheel commands can only take named parameters");
         return null;
       }
     } else {
@@ -485,7 +535,7 @@ export class CommandBox {
       // { "jid": "20180718173942195461", "minions": [ ... ] }
     }
 
-    return this.api.apiRequest("POST", "/", params);
+    return this.router.api.apiRequest("POST", "/", params);
   }
 
   static handleSaltJobRetEvent (pTag, pData) {
@@ -500,7 +550,7 @@ export class CommandBox {
     const eventJid = part[2];
     const eventMinionId = part[4];
 
-    if (CommandBox.jid !== eventJid) {
+    if (CmdPage.jid !== eventJid) {
       // not the job that we are looking at
       return;
     }
@@ -547,7 +597,7 @@ export class CommandBox {
     const eventMinionId = part[4];
     const eventSeqNr = parseInt(part[5], 10);
 
-    if (CommandBox.jid !== eventJid) {
+    if (CmdPage.jid !== eventJid) {
       // not the job that we are looking at
       return;
     }
@@ -574,8 +624,8 @@ export class CommandBox {
 
   static _prepareForAsyncResults (pResponse) {
     const ret = pResponse.return[0];
-    CommandBox.jid = ret.jid;
-    CommandBox.minionIds = ret.minions;
+    CmdPage.jid = ret.jid;
+    CmdPage.minionIds = ret.minions;
 
     const output = document.querySelector(".run-command pre");
 
@@ -600,7 +650,7 @@ export class CommandBox {
     output.appendChild(spacerDiv);
 
     // add new minions list to track progress of this state command
-    for (const minionId of CommandBox.minionIds) {
+    for (const minionId of CmdPage.minionIds) {
       const minionDiv = document.createElement("div");
       minionDiv.id = "run-" + Utils.getIdFromMinionId(minionId);
       minionDiv.style.marginTop = 0;

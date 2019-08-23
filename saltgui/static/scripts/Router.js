@@ -146,6 +146,11 @@ export class Router {
     this._registerMenuItem(null, "events", "eventsview");
     this._registerMenuItem("events", "reactors", "reactors");
     this._registerMenuItem(null, "logout", "logout");
+
+    document.querySelector("#button-cmd").
+      addEventListener("click", () => {
+        this.goTo.replace("cmd");
+      });
   }
 
   _registerPage (pPage) {

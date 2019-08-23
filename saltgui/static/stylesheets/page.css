@@ -201,10 +201,6 @@ table tr td:last-of-type {
   vertical-align: middle;
 }
 
-#popup-run-command {
-  display: none;
-}
-
 .jobs td .target {
   font-weight: 500;
   font-size: 18px;

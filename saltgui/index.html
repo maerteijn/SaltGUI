@@ -17,6 +17,7 @@
     <link rel='stylesheet' type='text/css' href='static/stylesheets/tooltip.css'/>
     <link rel='stylesheet' type='text/css' href='static/stylesheets/options.css'/>
     <link rel='stylesheet' type='text/css' href='static/stylesheets/events.css'/>
+    <link rel='stylesheet' type='text/css' href='static/stylesheets/cmd.css'/>
     <link rel='shortcut icon' href='static/images/icon.png'/>
   </head>
 
@@ -41,21 +42,6 @@
     </header>
 
     <div id='route-container'>
-    </div>
-
-    <div class='popup' id='popup-run-command'>
-      <div class='run-command'>
-        <!-- 2716 = HEAVY MULTIPLICATION X -->
-        <div class='nearly-visible-button' id='cmd-close-button'>&#x2716;</div>
-        <!-- 2753 = BLACK QUESTION MARK ORNAMENT -->
-        <!-- FE0E = VARIATION SELECTOR-15 (render as text) -->
-        <span id="help" style="float: right; cursor: help; margin-right: 20px">&#x2753;&#xFE0E;</span>
-        <div><h1>Manual Run</h1><p id="template-menu-here"></p></div>
-        <div id="target-box"><input list="data-list-target" id='target' type='text' placeholder="Target"/></div>
-        <div id="cmd-box"><input id='command' type='text' placeholder="Command"/></div>
-        <div id="run-block"><input id="run-command" type='submit' value="Run command"/></div>
-        <pre id="popup-output" class='output'>Waiting for command...</pre>
-      </div>
     </div>
 
     <datalist id="data-list-target">

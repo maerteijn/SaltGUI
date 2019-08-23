@@ -76,7 +76,7 @@ export class Documentation {
     if (button.disabled) {
       return;
     }
-    const output = document.getElementById("popup-output");
+    const output = document.getElementById("output");
 
     const targetField = document.getElementById("target");
     let target = targetField.value;

@@ -1,0 +1,15 @@
+Branch zzz-cmdpage
+("zzz" to move it to the bottom of the list)
+PoC for using a regular page instead of the command popup-box
+
+PRO:
+* everything is a page
+
+CON:
+* navigation becomes a hassle. that needs to be additionally improved.
+* going back to a previous page is always a page navigation (instead of hide)
+  that means most pages will do a full refresh
+  which takes a way much of the improvements
+
+VERDICT:
+Keep until there is an actual request for it
