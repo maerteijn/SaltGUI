@@ -1,0 +1,19 @@
+td.mine-config {
+  white-space: pre;
+}
+
+td.mine-value1 {
+  white-space: pre;
+}
+
+td.mine-value2 {
+  white-space: pre-wrap;
+}
+
+#page-mine {
+  width: 100%;
+}
+
+.mine {
+  padding: 0;
+}

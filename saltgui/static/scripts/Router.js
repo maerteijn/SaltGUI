@@ -13,6 +13,8 @@ import {JobsPage} from "./pages/Jobs.js";
 import {KeysPage} from "./pages/Keys.js";
 import {LoginPage} from "./pages/Login.js";
 import {LogoutPage} from "./pages/Logout.js";
+import {MineMinionPage} from "./pages/MineMinion.js";
+import {MinePage} from "./pages/Mine.js";
 import {MinionsPage} from "./pages/Minions.js";
 import {OptionsPage} from "./pages/Options.js";
 import {PillarsMinionPage} from "./pages/PillarsMinion.js";
@@ -39,6 +41,8 @@ export class Router {
     this._registerPage(this.keysPage = new KeysPage(this));
     this._registerPage(this.grainsPage = new GrainsPage(this));
     this._registerPage(this.grainsMinionPage = new GrainsMinionPage(this));
+    this._registerPage(new MinePage(this));
+    this._registerPage(new MineMinionPage(this));
     this._registerPage(this.schedulesPage = new SchedulesPage(this));
     this._registerPage(this.schedulesMinionPage = new SchedulesMinionPage(this));
     this._registerPage(this.pillarsPage = new PillarsPage(this));
@@ -140,6 +144,7 @@ export class Router {
     this._registerMenuItem("minions", "schedules", "schedules");
     this._registerMenuItem("minions", "pillars", "pillars");
     this._registerMenuItem("minions", "beacons", "beacons");
+    this._registerMenuItem("minions", "mine", "mine");
     this._registerMenuItem(null, "keys", "keys");
     this._registerMenuItem(null, "jobs", "jobs");
     this._registerMenuItem("jobs", "templates", "templates");

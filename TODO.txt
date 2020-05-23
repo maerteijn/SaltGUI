@@ -1,0 +1,12 @@
+Branch zzz-mine
+("zzz" to move it to the bottom of the list)
+PoC for showing 'mine' data
+
+PRO:
+* it make mine-data visible in an organized way
+
+CON:
+* there is no demand for this yet
+
+VERDICT:
+Keep until there is an actual request for it

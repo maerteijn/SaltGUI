@@ -148,6 +148,8 @@ export class JobsPanel extends Panel {
     this._hideJobs.push("grains.delval");
     this._hideJobs.push("grains.items");
     this._hideJobs.push("grains.setval");
+    this._hideJobs.push("mine.get");
+    this._hideJobs.push("mine.valid");
     this._hideJobs.push("pillar.items");
     this._hideJobs.push("pillar.obfuscate");
     this._hideJobs.push("ps.kill_pid");
