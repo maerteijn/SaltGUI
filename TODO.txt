@@ -1,0 +1,13 @@
+Branch zzz-orchestrate
+("zzz" to move it to the bottom of the list)
+PoC for supporting the orchestration config
+
+PRO:
+* previously, orchestrations were not supported
+
+CON:
+* the support is still incomplete
+* so far, no one really need this
+
+VERDICT:
+Keep until there is an actual request for it
