@@ -5,6 +5,7 @@ import {OutputDocumentation} from "./OutputDocumentation.js";
 import {OutputHighstate} from "./OutputHighstate.js";
 import {OutputJson} from "./OutputJson.js";
 import {OutputNested} from "./OutputNested.js";
+import {OutputToml} from "./OutputToml.js";
 import {OutputYaml} from "./OutputYaml.js";
 import {ParseCommandLine} from "../ParseCommandLine.js";
 import {Utils} from "../Utils.js";
@@ -99,6 +100,10 @@ export class Output {
 
     if (Output.isOutputFormatAllowed("yaml")) {
       return OutputYaml.formatYAML(pObject);
+    }
+
+    if (Output.isOutputFormatAllowed("toml")) {
+      return OutputToml.formatTOML(pObject);
     }
 
     if (Output.isOutputFormatAllowed("nested")) {

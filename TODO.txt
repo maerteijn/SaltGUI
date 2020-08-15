@@ -1,0 +1,13 @@
+Branch zzz-toml
+("zzz" to move it to the bottom of the list)
+PoC for supporting the TOML output representation
+
+PRO:
+* previously, TOML output is not supported
+
+CON:
+* TOML is not supported in the regular Salt version
+* so far, no one really need this
+
+VERDICT:
+Keep until there is an actual request for it
