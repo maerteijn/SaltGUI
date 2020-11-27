@@ -12,7 +12,7 @@ export class TemplatesPanel extends Panel {
 
     this.addTitle("Templates");
     this.addSearchButton();
-    this.addTable(["Name", "Description", "Target", "Command", "-menu-"]);
+    this.addTable(["Name", "Location", "Description", "Target", "Command", "-menu-"]);
     this.setTableSortable("Name", "asc");
     this.setTableClickable();
     this.addMsg();
@@ -36,28 +36,46 @@ export class TemplatesPanel extends Panel {
     }
 
     // should we update it or just use from cache (see commandbox) ?
-    let templates = pWheelConfigValuesData.return[0].data.return.saltgui_templates;
-    if (templates) {
-      Utils.setStorageItem("session", "templates", JSON.stringify(templates));
+    let remoteTemplates = pWheelConfigValuesData.return[0].data.return.saltgui_templates;
+    if (remoteTemplates) {
+      Utils.setStorageItem("session", "templates", JSON.stringify(remoteTemplates));
       Router.updateMainMenu();
     } else {
-      templates = {};
-    }
-    const keys = Object.keys(templates).sort();
-    for (const key of keys) {
-      const template = templates[key];
-      this._addTemplate(key, template);
+      remoteTemplates = {};
     }
 
-    const txt = Utils.txtZeroOneMany(keys.length,
+    const remoteKeys = Object.keys(remoteTemplates).sort();
+    for (const key of remoteKeys) {
+      const template = remoteTemplates[key];
+      this._addTemplate("remote", key, template);
+    }
+
+    const localTemplatesText = Utils.getStorageItem("local", "templates", "{}");
+    const localTemplates = JSON.parse(localTemplatesText);
+
+    const localKeys = Object.keys(localTemplates).sort();
+    for (const key of localKeys) {
+      const template = localTemplates[key];
+      this._addTemplate("local", key, template);
+    }
+
+    let txt = Utils.txtZeroOneMany(remoteKeys.length + localKeys.length,
       "No templates", "{0} template", "{0} templates");
+    if (remoteKeys.length > 0 && localKeys.length > 0) {
+      txt += Utils.txtZeroOneMany(remoteKeys.length,
+        "", ", {0} remote template", ", {0} remote templates");
+      txt += Utils.txtZeroOneMany(localKeys.length,
+        "", ", {0} local template", ", {0} local templates");
+    }
     this.setMsg(txt);
   }
 
-  _addTemplate (pTemplateName, template) {
+  _addTemplate (pLocation, pTemplateName, template) {
     const tr = document.createElement("tr");
 
     tr.appendChild(Utils.createTd("name", pTemplateName));
+
+    tr.appendChild(Utils.createTd("location", pLocation));
 
     // calculate description
     const description = template["description"];
