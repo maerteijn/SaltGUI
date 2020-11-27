@@ -46,8 +46,15 @@ export class CommandBox {
     const menu = new DropDownMenu(titleElement);
 
     menu.addMenuItem(
-      "Save as template",
       () => {
+        const command = document.getElementById("command").value;
+        const cmd = ParseCommandLine.getCommandFromCommandLine(command);
+        if (cmd && cmd.startsWith("#")) {
+          // do not allow internal commands to be saved as template
+          return null;
+        }
+        return "Save as template";
+      }, () => {
         let cmd = "#template.save";
         cmd += JobPanel.getArgumentText("name", "<name>");
         cmd += JobPanel.getArgumentText("description", "<description>");
