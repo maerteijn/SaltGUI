@@ -36,18 +36,18 @@ export class TemplatesPanel extends Panel {
     }
 
     // should we update it or just use from cache (see commandbox) ?
-    let remoteTemplates = pWheelConfigValuesData.return[0].data.return.saltgui_templates;
-    if (remoteTemplates) {
-      Utils.setStorageItem("session", "templates", JSON.stringify(remoteTemplates));
+    let masterTemplates = pWheelConfigValuesData.return[0].data.return.saltgui_templates;
+    if (masterTemplates) {
+      Utils.setStorageItem("session", "templates", JSON.stringify(masterTemplates));
       Router.updateMainMenu();
     } else {
-      remoteTemplates = {};
+      masterTemplates = {};
     }
 
-    const remoteKeys = Object.keys(remoteTemplates).sort();
-    for (const key of remoteKeys) {
-      const template = remoteTemplates[key];
-      this._addTemplate("remote", key, template);
+    const masterKeys = Object.keys(masterTemplates).sort();
+    for (const key of masterKeys) {
+      const template = masterTemplates[key];
+      this._addTemplate("master", key, template);
     }
 
     const localTemplatesText = Utils.getStorageItem("local", "templates", "{}");
@@ -59,11 +59,11 @@ export class TemplatesPanel extends Panel {
       this._addTemplate("local", key, template);
     }
 
-    let txt = Utils.txtZeroOneMany(remoteKeys.length + localKeys.length,
+    let txt = Utils.txtZeroOneMany(masterKeys.length + localKeys.length,
       "No templates", "{0} template", "{0} templates");
-    if (remoteKeys.length > 0 && localKeys.length > 0) {
-      txt += Utils.txtZeroOneMany(remoteKeys.length,
-        "", ", {0} remote template", ", {0} remote templates");
+    if (masterKeys.length > 0 && localKeys.length > 0) {
+      txt += Utils.txtZeroOneMany(masterKeys.length,
+        "", ", {0} master template", ", {0} master templates");
       txt += Utils.txtZeroOneMany(localKeys.length,
         "", ", {0} local template", ", {0} local templates");
     }
