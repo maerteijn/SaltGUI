@@ -121,9 +121,9 @@ export class TemplatesPanel extends Panel {
     });
   }
 
-  _addMenuItemApplyTemplate (pMenu, pTargetType, target, pCommand) {
+  _addMenuItemApplyTemplate (pMenu, pTargetType, pTarget, pCommand) {
     pMenu.addMenuItem("Apply template...", (pClickEvent) => {
-      this.runFullCommand(pClickEvent, pTargetType, target, pCommand);
+      this.runFullCommand(pClickEvent, pTargetType, pTarget, pCommand);
     });
   }
 }
