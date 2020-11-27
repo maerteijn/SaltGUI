@@ -3,6 +3,7 @@
 import {Character} from "./Character.js";
 import {Documentation} from "./Documentation.js";
 import {DropDownMenu} from "./DropDown.js";
+import {JobPanel} from "./panels/Job.js";
 import {Output} from "./output/Output.js";
 import {ParseCommandLine} from "./ParseCommandLine.js";
 import {Router} from "./Router.js";
@@ -43,6 +44,26 @@ export class CommandBox {
     }
 
     const menu = new DropDownMenu(titleElement);
+
+    menu.addMenuItem(
+      "Save as template",
+      () => {
+        let cmd = "#template.save";
+        cmd += JobPanel.getArgumentText("name", "<name>");
+        cmd += JobPanel.getArgumentText("description", "<description>");
+        const targetType = TargetType.menuTargetType._value;
+        cmd += JobPanel.getArgumentText("targettype", targetType);
+
+        const target = document.getElementById("target").value;
+        cmd += JobPanel.getArgumentText("target", target);
+        const command = document.getElementById("command").value;
+        cmd += JobPanel.getArgumentText("command", command);
+
+        document.getElementById("target").value = "";
+        document.getElementById("command").value = cmd;
+        TargetType.setTargetTypeDefault();
+      }
+    );
 
     for (const loc of ["session", "local"]) {
       const templatesText = Utils.getStorageItem(loc, "templates", "{}");

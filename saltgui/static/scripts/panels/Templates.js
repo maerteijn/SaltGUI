@@ -1,6 +1,7 @@
 /* global document */
 
 import {DropDownMenu} from "../DropDown.js";
+import {JobPanel} from "./Job.js";
 import {Panel} from "./Panel.js";
 import {Router} from "../Router.js";
 import {Utils} from "../Utils.js";
@@ -112,6 +113,10 @@ export class TemplatesPanel extends Panel {
 
     const menu = new DropDownMenu(tr);
     this._addMenuItemApplyTemplate(menu, targetType, target, command);
+    if (pLocation === "local") {
+      this._addMenuItemEditTemplate(menu, pTemplateName, description, targetType, target, command);
+      this._addMenuItemDeleteTemplate(menu, pTemplateName);
+    }
 
     const tbody = this.table.tBodies[0];
     tbody.appendChild(tr);
@@ -124,6 +129,26 @@ export class TemplatesPanel extends Panel {
   _addMenuItemApplyTemplate (pMenu, pTargetType, pTarget, pCommand) {
     pMenu.addMenuItem("Apply template...", (pClickEvent) => {
       this.runFullCommand(pClickEvent, pTargetType, pTarget, pCommand);
+    });
+  }
+
+  _addMenuItemEditTemplate (pMenu, pName, pDescription, pTargetType, pTarget, pCommand) {
+    pMenu.addMenuItem("Edit template...", (pClickEvent) => {
+      let cmd = "#template.edit";
+      cmd += JobPanel.getArgumentText("name", pName);
+      cmd += JobPanel.getArgumentText("targettype", pTargetType);
+      cmd += JobPanel.getArgumentText("target", pTarget);
+      cmd += JobPanel.getArgumentText("command", pCommand);
+      cmd += JobPanel.getArgumentText("description", pDescription);
+      this.runFullCommand(pClickEvent, null, null, cmd);
+    });
+  }
+
+  _addMenuItemDeleteTemplate (pMenu, pName) {
+    pMenu.addMenuItem("Delete template...", (pClickEvent) => {
+      let cmd = "#template.delete";
+      cmd += JobPanel.getArgumentText("name", pName);
+      this.runFullCommand(pClickEvent, null, null, cmd);
     });
   }
 }
