@@ -35,27 +35,33 @@ export class CommandBox {
 
   static _populateTemplateMenu () {
     const titleElement = document.getElementById("template-menu-here");
+
     if (titleElement.childElementCount) {
       // only build one dropdown menu. cannot be done in constructor
       // since the storage-item is then not populated yet.
       return;
     }
+
     const menu = new DropDownMenu(titleElement);
-    const templatesText = Utils.getStorageItem("session", "templates", "{}");
-    const templates = JSON.parse(templatesText);
-    const keys = Object.keys(templates).sort();
-    for (const key of keys) {
-      const template = templates[key];
-      let description = template["description"];
-      if (!description) {
-        description = "(" + key + ")";
-      }
-      menu.addMenuItem(
-        description,
-        () => {
-          CommandBox._applyTemplate(template);
+
+    for (const loc of ["session", "local"]) {
+      const templatesText = Utils.getStorageItem(loc, "templates", "{}");
+      const templates = JSON.parse(templatesText);
+      const keys = Object.keys(templates).sort();
+      for (const key of keys) {
+        const template = templates[key];
+        const label = loc === "session" ? "master" : "local";
+        let description = label + ": " + template["description"];
+        if (!description) {
+          description = "(" + key + ")";
         }
-      );
+        menu.addMenuItem(
+          description,
+          () => {
+            CommandBox._applyTemplate(template);
+          }
+        );
+      }
     }
   }
 
