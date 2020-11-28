@@ -1,5 +1,6 @@
 /* global document */
 
+import {CommandBox} from "../CommandBox.js";
 import {DropDownMenu} from "../DropDown.js";
 import {JobPanel} from "./Job.js";
 import {Panel} from "./Panel.js";
@@ -134,7 +135,7 @@ export class TemplatesPanel extends Panel {
 
   _addMenuItemEditTemplate (pMenu, pName, pDescription, pTargetType, pTarget, pCommand) {
     pMenu.addMenuItem("Edit template...", (pClickEvent) => {
-      let cmd = "#template.edit";
+      let cmd = "#template.save";
       cmd += JobPanel.getArgumentText("name", pName);
       cmd += JobPanel.getArgumentText("targettype", pTargetType);
       cmd += JobPanel.getArgumentText("target", pTarget);
@@ -150,5 +151,27 @@ export class TemplatesPanel extends Panel {
       cmd += JobPanel.getArgumentText("name", pName);
       this.runFullCommand(pClickEvent, null, null, cmd);
     });
+  }
+
+  static runDelete (pArgs) {
+    const localTemplatesText = Utils.getStorageItem("local", "templates", "{}");
+    const localTemplates = JSON.parse(localTemplatesText);
+    const name = pArgs.name;
+    if (name === undefined) {
+      CommandBox._showError("Missing parameter 'name=...'");
+      return;
+    }
+    if (!(name in localTemplates)) {
+      CommandBox._showError("Unknown local template '" + name + "'");
+      return;
+    }
+    delete localTemplates[name];
+    Utils.setStorageItem("local", "templates", JSON.stringify(localTemplates));
+    CommandBox.refreshOnClose = true;
+    CommandBox.onRunReturn("Deleted local template '" + name + "'", "");
+  }
+
+  static runSave (pArgs) {
+    CommandBox._showError("Not implemented yet (#template.save)" + pArgs);
   }
 }

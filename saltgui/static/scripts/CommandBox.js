@@ -9,6 +9,7 @@ import {ParseCommandLine} from "./ParseCommandLine.js";
 import {Router} from "./Router.js";
 import {RunType} from "./RunType.js";
 import {TargetType} from "./TargetType.js";
+import {TemplatesPanel} from "./panels/Templates.js";
 import {Utils} from "./Utils.js";
 
 export class CommandBox {
@@ -459,7 +460,8 @@ export class CommandBox {
     // WHEEL commands also do not have a target
     // but we use the TARGET value to form the usually required MATCH parameter
     // therefore for WHEEL commands it is still required
-    if (pTarget === "" && functionToRun !== "runners" && !functionToRun.startsWith("runners.")) {
+    // internal commands also do not need a target
+    if (pTarget === "" && functionToRun !== "runners" && !functionToRun.startsWith("runners.") && !functionToRun.startsWith("#")) {
       CommandBox._showError("'Target' field cannot be empty");
       return null;
     }
@@ -473,6 +475,27 @@ export class CommandBox {
         CommandBox._showError("Unknown nodegroup '" + pTarget + "'");
         return null;
       }
+    }
+
+    if (functionToRun.startsWith("#")) {
+      if (pTarget) {
+        CommandBox._showError("Internal commands cannot use a target value");
+        return null;
+      }
+      if (argsArray.length > 0) {
+        CommandBox._showError("Internal commands cannot use unnamed parameters");
+        return null;
+      }
+      if (functionToRun === "#template.delete") {
+        TemplatesPanel.runDelete(argsObject);
+        return null;
+      }
+      if (functionToRun === "#template.save") {
+        TemplatesPanel.runSave(argsObject);
+        return null;
+      }
+      CommandBox._showError("Unknown internal command '" + functionToRun + "'");
+      return null;
     }
 
     let params = {};
