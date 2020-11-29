@@ -50,7 +50,7 @@ export class CommandBox {
       () => {
         const command = document.getElementById("command").value;
         const cmd = ParseCommandLine.getCommandFromCommandLine(command);
-        if (cmd && cmd.startsWith("#")) {
+        if (cmd && typeof cmd === "string" && cmd.startsWith("#")) {
           // do not allow internal commands to be saved as template
           return null;
         }

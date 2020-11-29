@@ -195,6 +195,10 @@ export class Documentation {
       return ["modules"];
     }
 
+    if (typeof argsArray[0] !== "string") {
+      return ["modules"];
+    }
+
     let cmd = argsArray[0].replace(/[.]*$/, "").split(".");
 
     // re-organize the command with its formal category
