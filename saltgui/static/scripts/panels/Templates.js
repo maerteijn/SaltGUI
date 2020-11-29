@@ -172,6 +172,25 @@ export class TemplatesPanel extends Panel {
   }
 
   static runSave (pArgs) {
-    CommandBox._showError("Not implemented yet (#template.save)" + pArgs);
+    const localTemplatesText = Utils.getStorageItem("local", "templates", "{}");
+    const localTemplates = JSON.parse(localTemplatesText);
+    const name = pArgs.name;
+    if (name === undefined) {
+      CommandBox._showError("Missing parameter 'name=...'");
+      return;
+    }
+    const template = {};
+    for (const key of ["targettype", "target", "command", "description"]) {
+      if (key in pArgs) {
+        template[key] = pArgs[key];
+      }
+    }
+    localTemplates[name] = template;
+    Utils.setStorageItem("local", "templates", JSON.stringify(localTemplates));
+    CommandBox.refreshOnClose = true;
+    CommandBox.onRunReturn("Saved local template '" + name + "'", "");
+
+    // revert to the command that the user was saving
+    CommandBox._applyTemplate(template);
   }
 }
