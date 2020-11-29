@@ -50,6 +50,11 @@ export class Documentation {
 
     const cmdFragments = Documentation.getKeywordFragments(commandLine);
 
+    if (cmdFragments.length >= 2 && cmdFragments[1].startsWith("#")) {
+      // no documentation available for internal commands like '#template.save'
+      return null;
+    }
+
     const category = cmdFragments.shift();
     let arg = "";
     if (cmdFragments.length) {
@@ -226,6 +231,10 @@ export class Documentation {
   static _manualRunMenuHtmlDocPrepare () {
     const commandLine = document.querySelector(".run-command #command").value;
     const cmd = Documentation.getKeywordFragments(commandLine);
+    if (cmd.length >= 2 && cmd[1].startsWith("#")) {
+      // no documentation available for internal commands like '#template.save'
+      return null;
+    }
     return "Online reference for '" + cmd.join(".").replace(/^modules[.]/, "") + "'";
   }
 
