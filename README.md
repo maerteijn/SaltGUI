@@ -106,7 +106,8 @@ Note that the effect is achieved by string truncation only. This is equivalent t
 ## Templates
 SaltGUI supports command templates for easier command entry into the command-box.
 The menu item for that becomes visible there when you define one or more templates
-in salt master configuration file `/etc/salt/master`.
+in salt master configuration file `/etc/salt/master` or when you have saved
+the values of the command-box as a template.
 The field `targettype` supports the values `glob`, `list`, `compound` and `nodegroup`.
 Entries will be sorted in the GUI based on their key.
 You can leave out any detail field.
@@ -123,6 +124,8 @@ saltgui_templates:
         target: dev*
         command: test.version
 ```
+Templates that are defined in the `master` file are immutable. Local templates
+are stored in the user's browser and can be created, updated and deleted.
 
 ## Jobs
 SaltGUI shows a maximum of 7 jobs in on the right-hand-side of the screen.
