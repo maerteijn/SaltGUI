@@ -75,6 +75,10 @@ pre .task-success {
 }
 
 pre .task-changes {
+  color: aqua;
+}
+
+pre .task-summary .task-changes {
   text-decoration-line: overline underline;
   text-decoration-style: double;
 }
