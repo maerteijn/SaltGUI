@@ -1,14 +1,14 @@
-#page-minions {
-  width: 100%;
-}
-
 .dashboard {
+  width: 100%;
   display: flex;
-  align-items: flex-start;
 }
 
 .dashboard .panel {
   width: 100%;
+}
+
+.dashboard .panel#login-panel {
+  width: initial;
 }
 
 pre a.disabled {
@@ -226,18 +226,8 @@ table tr td:last-of-type {
   font-size: 12px;
 }
 
-#page-jobs .job-status {
+#jobs-panel .job-status {
   font-size: inherit;
-}
-
-#jobs-panel {
-  /* the left panel has the default 100%, therefore the ratio is 2/3 vs 1/3 */
-  flex-basis: 50%;
-}
-
-#page-jobs #jobs-panel {
-  /* no right panel here */
-  flex-basis: 100%;
 }
 
 .highlight-rows tbody tr:hover {

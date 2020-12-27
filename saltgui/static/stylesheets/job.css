@@ -1,15 +1,11 @@
-#page-job .time {
+#job-panel .time {
   font-size: 15px;
   font-weight: normal;
   margin-top: 5px;
   margin-bottom: 5px;
 }
 
-#page-job .job-menu {
-  display: inline;
-}
-
-#page-job .highlight-task {
+#job-panel .highlight-task {
   background-color: gray;
 }
 

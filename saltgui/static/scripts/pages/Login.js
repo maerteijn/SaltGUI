@@ -6,7 +6,7 @@ import {Page} from "./Page.js";
 export class LoginPage extends Page {
 
   constructor (pRouter) {
-    super("login", "Login", "page-login", "", pRouter);
+    super("login", "Login", "", pRouter);
 
     this.login = new LoginPanel();
     this.login.router = pRouter;

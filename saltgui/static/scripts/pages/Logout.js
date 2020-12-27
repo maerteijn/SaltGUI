@@ -6,7 +6,7 @@ import {Utils} from "../Utils.js";
 export class LogoutPage extends Page {
 
   constructor (pRouter) {
-    super("logout", "Logout", "page-logout", "", pRouter);
+    super("logout", "Logout", "", pRouter);
   }
 
   onRegister () {

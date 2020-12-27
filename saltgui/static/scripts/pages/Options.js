@@ -7,7 +7,7 @@ import {StatsPanel} from "../panels/Stats.js";
 export class OptionsPage extends Page {
 
   constructor (pRouter) {
-    super("options", "Options", "page-options", "", pRouter);
+    super("options", "Options", "", pRouter);
 
     this.options = new OptionsPanel();
     super.addPanel(this.options);

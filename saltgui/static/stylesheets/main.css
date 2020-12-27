@@ -26,7 +26,7 @@ header {
   font-weight: normal;
   display: block;
   float: left;
-  padding: 10px 20px 10px 20px;
+  padding: 10px 20px 6px 20px;
 
   /* prevent text selection */
   -webkit-user-select: none;
@@ -53,12 +53,17 @@ h1 {
   background-color: white;
   padding: 20px;
   border-radius: 1px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s; /* Can be used to add transitions between views */
 
   /* separate main-panel and jobs-panel */
   margin: 5px 0 0 5px;
 }
 
-.panel:first-of-type {
+.panel1 {
+  /* first-of-type cannot be used here
+     we need the first visible panel */
   margin-left: 0;
 }
 
@@ -162,18 +167,9 @@ h1 {
   padding: 5px 10px 5px 20px;
 }
 
-.route {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s; /* Can be used to add transitions between views */
-  position: absolute;
-  width: 100%;
-}
-
-.route.current {
+.panel.current {
   opacity: 1;
   pointer-events: all;
-  z-index: 2;
 }
 
 .popup {

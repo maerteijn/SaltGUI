@@ -6,7 +6,7 @@ import {Page} from "./Page.js";
 export class JobPage extends Page {
 
   constructor (pRouter) {
-    super("job", "Job", "page-job", "button-jobs", pRouter);
+    super("job", "Job", "button-jobs", pRouter);
 
     this.job = new JobPanel();
     super.addPanel(this.job);
