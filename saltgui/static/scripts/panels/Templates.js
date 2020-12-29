@@ -41,7 +41,7 @@ export class TemplatesPanel extends Panel {
     let masterTemplates = pWheelConfigValuesData.return[0].data.return.saltgui_templates;
     if (masterTemplates) {
       Utils.setStorageItem("session", "templates", JSON.stringify(masterTemplates));
-      Router.updateMainMenu();
+      this.router.updateMainMenu();
     } else {
       masterTemplates = {};
     }
