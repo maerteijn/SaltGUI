@@ -303,6 +303,7 @@ export class Output {
   static _addHighStateSummary (pMinionRow, pMinionDiv, pMinionId, pTasks) {
 
     let nr = 0;
+    const summarySpan = Utils.createSpan("task-summary", "");
 
     for (const task of pTasks) {
 
@@ -343,13 +344,21 @@ export class Output {
         taskDiv.scrollIntoView({"behavior": "smooth", "block": "nearest"});
       });
 
-      pMinionRow.append(span);
+      summarySpan.append(span);
     }
+
+    pMinionRow.append(summarySpan);
   }
 
   static _getIsSuccess (pMinionResponse) {
+    if (!pMinionResponse) {
+      return false;
+    }
     if (Output._hasProperties(pMinionResponse, ["retcode", "return", "success"])) {
       return pMinionResponse.success;
+    }
+    if (Output._hasProperties(pMinionResponse, ["retcode", "ret", "jid"])) {
+      return pMinionResponse.retcode === 0;
     }
     return true;
   }
@@ -358,12 +367,18 @@ export class Output {
     if (Output._hasProperties(pMinionResponse, ["retcode", "return", "success"])) {
       return pMinionResponse.retcode;
     }
+    if (Output._hasProperties(pMinionResponse, ["retcode", "ret", "jid"])) {
+      return pMinionResponse.retcode;
+    }
     return 0;
   }
 
   static _getMinionResponse (pCommand, pMinionResponse) {
     if (Output._hasProperties(pMinionResponse, ["retcode", "return", "success"])) {
       return pMinionResponse.return;
+    }
+    if (Output._hasProperties(pMinionResponse, ["retcode", "ret", "jid"])) {
+      return pMinionResponse.ret;
     }
     if (pCommand.startsWith("runner.") && pMinionResponse && pMinionResponse["return"] !== undefined) {
       return pMinionResponse.return.return;
@@ -443,11 +458,9 @@ export class Output {
         if (typeof result !== "object") {
           continue;
         }
-        if (!("success" in result)) {
-          continue;
-        }
         // use keys that can conveniently be sorted
-        const key = (result.success ? "0-" : "1-") + result.retcode;
+        const isSuccess = Output._getIsSuccess(result);
+        const key = (isSuccess ? "0-" : "1-") + result.retcode;
         if (summary[key] === undefined) {
           summary[key] = 0;
         }
@@ -550,7 +563,7 @@ export class Output {
       let fndRepresentation = false;
 
       // implicit !fndRepresentation&&
-      if (pResponse[minionId] === undefined) {
+      if (pResponse[minionId] === undefined || pResponse[minionId] === false) {
         minionOutput = Output._getTextOutput("(no response)");
         minionOutput.classList.add("noresponse");
         fndRepresentation = true;

@@ -3,7 +3,7 @@ import {Utils} from "../Utils.js";
 
 export class OutputHighstateSummaryOriginal {
 
-  static addSummarySpan (pDiv, pMinionId, pSucceeded, pFailed, pSkipped, pTotalMilliSeconds, pChanges) {
+  static addSummarySpan (pDiv, pMinionId, pSucceeded, pFailed, pSkipped, pTotalMilliSeconds, pChangesSummary) {
 
     let txt = "\nSummary for " + pMinionId;
     txt += "\n------------";
@@ -12,19 +12,17 @@ export class OutputHighstateSummaryOriginal {
     pDiv.append(summarySpan);
 
     txt = "\nSucceeded: " + pSucceeded;
-    const succeededSpan = Utils.createSpan("", txt);
-    succeededSpan.style.color = "lime";
+    const succeededSpan = Utils.createSpan("task-success", txt);
     pDiv.append(succeededSpan);
 
-    if (pChanges > 0) {
+    if (pChangesSummary > 0) {
       txt = " (";
       const oSpan = Utils.createSpan("", txt);
       oSpan.style.color = "white";
       pDiv.append(oSpan);
 
-      txt = "changed=" + pChanges;
-      const changedSpan = Utils.createSpan("", txt);
-      changedSpan.style.color = "lime";
+      txt = "changed=" + pChangesSummary;
+      const changedSpan = Utils.createSpan("task-changes", txt);
       pDiv.append(changedSpan);
 
       txt = ")";
@@ -36,7 +34,7 @@ export class OutputHighstateSummaryOriginal {
     txt = "\nFailed:    " + pFailed;
     const failedSpan = Utils.createSpan("", txt);
     if (pFailed > 0) {
-      failedSpan.style.color = "red";
+      failedSpan.classList.add("task-failure");
     } else {
       failedSpan.style.color = "aqua";
     }

@@ -518,11 +518,11 @@ export class JobPanel extends Panel {
     if (newLevel > oldLevel) {
       span.dataset.level = newLevel;
       if (newLevel === 1) {
-        span.style.color = "lime";
+        span.classList.add("host-success");
       } else if (newLevel === 2) {
-        span.style.color = "yellow";
+        span.classList.add("host-skips");
       } else if (newLevel === 3) {
-        span.style.color = "red";
+        span.classList.add("host-failed");
       }
     }
     span.style.removeProperty("display");

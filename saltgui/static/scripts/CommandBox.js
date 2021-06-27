@@ -467,6 +467,7 @@ export class CommandBox {
       params.client = "local";
       params.fun = functionToRun;
       params.tgt = pTarget;
+      params["full_return"] = true;
       if (pTargetType) {
         params["tgt_type"] = pTargetType;
       }
@@ -604,6 +605,7 @@ export class CommandBox {
       const minionDiv = document.createElement("div");
       minionDiv.id = "run-" + Utils.getIdFromMinionId(minionId);
       minionDiv.style.marginTop = 0;
+      minionDiv.classList.add("task-summary");
 
       const minionSpan1 = document.createElement("span");
       minionSpan1.innerText = minionId;

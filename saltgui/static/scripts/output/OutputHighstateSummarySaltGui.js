@@ -3,7 +3,7 @@ import {Utils} from "../Utils.js";
 
 export class OutputHighstateSummarySaltGui {
 
-  static addSummarySpan (pDiv, pSucceeded, pFailed, pSkipped, pTotalMilliSeconds, pChanges, pHidden) {
+  static addSummarySpan (pDiv, pSucceeded, pFailed, pSkipped, pTotalMilliSeconds, pChangesDetail, pHidden) {
 
     // add a summary line
     let line = "";
@@ -29,7 +29,7 @@ export class OutputHighstateSummarySaltGui {
     // note that the number of changes may be higher or lower
     // than the number of tasks. tasks may contribute multiple
     // changes, or tasks may have no changes.
-    line += Utils.txtZeroOneMany(pChanges, "", ", {0} change", ", {0} changes");
+    line += Utils.txtZeroOneMany(pChangesDetail, "", ", {0} change", ", {0} changes");
 
     // multiple durations and significant?
     if (total > 1 && pTotalMilliSeconds >= 10) {
