@@ -122,6 +122,9 @@ export class DropDownMenu {
     this._value = pValue;
     pCallBack(pClickEvent);
     pClickEvent.stopPropagation();
+    // just in case the menu remains visible
+    // and has items that change visibility
+    this.verifyAll();
   }
 
   setTitle (pTitle) {

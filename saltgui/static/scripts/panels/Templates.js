@@ -1,6 +1,8 @@
 /* global document */
 
+import {CommandBox} from "../CommandBox.js";
 import {DropDownMenu} from "../DropDown.js";
+import {JobPanel} from "./Job.js";
 import {Panel} from "./Panel.js";
 import {Router} from "../Router.js";
 import {Utils} from "../Utils.js";
@@ -12,7 +14,7 @@ export class TemplatesPanel extends Panel {
 
     this.addTitle("Templates");
     this.addSearchButton();
-    this.addTable(["Name", "Description", "Target", "Command", "-menu-"]);
+    this.addTable(["Name", "Location", "Description", "Target", "Command", "-menu-"]);
     this.setTableSortable("Name", "asc");
     this.setTableClickable();
     this.addMsg();
@@ -36,28 +38,46 @@ export class TemplatesPanel extends Panel {
     }
 
     // should we update it or just use from cache (see commandbox) ?
-    let templates = pWheelConfigValuesData.return[0].data.return.saltgui_templates;
-    if (templates) {
-      Utils.setStorageItem("session", "templates", JSON.stringify(templates));
-      Router.updateMainMenu();
+    let masterTemplates = pWheelConfigValuesData.return[0].data.return.saltgui_templates;
+    if (masterTemplates) {
+      Utils.setStorageItem("session", "templates", JSON.stringify(masterTemplates));
+      this.router.updateMainMenu();
     } else {
-      templates = {};
-    }
-    const keys = Object.keys(templates).sort();
-    for (const key of keys) {
-      const template = templates[key];
-      this._addTemplate(key, template);
+      masterTemplates = {};
     }
 
-    const txt = Utils.txtZeroOneMany(keys.length,
+    const masterKeys = Object.keys(masterTemplates).sort();
+    for (const key of masterKeys) {
+      const template = masterTemplates[key];
+      this._addTemplate("master", key, template);
+    }
+
+    const localTemplatesText = Utils.getStorageItem("local", "templates", "{}");
+    const localTemplates = JSON.parse(localTemplatesText);
+
+    const localKeys = Object.keys(localTemplates).sort();
+    for (const key of localKeys) {
+      const template = localTemplates[key];
+      this._addTemplate("local", key, template);
+    }
+
+    let txt = Utils.txtZeroOneMany(masterKeys.length + localKeys.length,
       "No templates", "{0} template", "{0} templates");
+    if (masterKeys.length > 0 && localKeys.length > 0) {
+      txt += Utils.txtZeroOneMany(masterKeys.length,
+        "", ", {0} master template", ", {0} master templates");
+      txt += Utils.txtZeroOneMany(localKeys.length,
+        "", ", {0} local template", ", {0} local templates");
+    }
     this.setMsg(txt);
   }
 
-  _addTemplate (pTemplateName, template) {
+  _addTemplate (pLocation, pTemplateName, template) {
     const tr = document.createElement("tr");
 
     tr.appendChild(Utils.createTd("name", pTemplateName));
+
+    tr.appendChild(Utils.createTd("location", pLocation));
 
     // calculate description
     const description = template["description"];
@@ -94,6 +114,10 @@ export class TemplatesPanel extends Panel {
 
     const menu = new DropDownMenu(tr);
     this._addMenuItemApplyTemplate(menu, targetType, target, command);
+    if (pLocation === "local") {
+      this._addMenuItemEditTemplate(menu, pTemplateName, description, targetType, target, command);
+      this._addMenuItemDeleteTemplate(menu, pTemplateName);
+    }
 
     const tbody = this.table.tBodies[0];
     tbody.appendChild(tr);
@@ -103,9 +127,70 @@ export class TemplatesPanel extends Panel {
     });
   }
 
-  _addMenuItemApplyTemplate (pMenu, pTargetType, target, pCommand) {
+  _addMenuItemApplyTemplate (pMenu, pTargetType, pTarget, pCommand) {
     pMenu.addMenuItem("Apply template...", (pClickEvent) => {
-      this.runFullCommand(pClickEvent, pTargetType, target, pCommand);
+      this.runFullCommand(pClickEvent, pTargetType, pTarget, pCommand);
     });
+  }
+
+  _addMenuItemEditTemplate (pMenu, pName, pDescription, pTargetType, pTarget, pCommand) {
+    pMenu.addMenuItem("Edit template...", (pClickEvent) => {
+      let cmd = "#template.save";
+      cmd += JobPanel.getArgumentText("name", pName);
+      cmd += JobPanel.getArgumentText("targettype", pTargetType);
+      cmd += JobPanel.getArgumentText("target", pTarget);
+      cmd += JobPanel.getArgumentText("command", pCommand);
+      cmd += JobPanel.getArgumentText("description", pDescription);
+      this.runFullCommand(pClickEvent, null, null, cmd);
+    });
+  }
+
+  _addMenuItemDeleteTemplate (pMenu, pName) {
+    pMenu.addMenuItem("Delete template...", (pClickEvent) => {
+      let cmd = "#template.delete";
+      cmd += JobPanel.getArgumentText("name", pName);
+      this.runFullCommand(pClickEvent, null, null, cmd);
+    });
+  }
+
+  static runDelete (pArgs) {
+    const localTemplatesText = Utils.getStorageItem("local", "templates", "{}");
+    const localTemplates = JSON.parse(localTemplatesText);
+    const name = pArgs.name;
+    if (name === undefined) {
+      CommandBox._showError("Missing parameter 'name=...'");
+      return;
+    }
+    if (!(name in localTemplates)) {
+      CommandBox._showError("Unknown local template '" + name + "'");
+      return;
+    }
+    delete localTemplates[name];
+    Utils.setStorageItem("local", "templates", JSON.stringify(localTemplates));
+    CommandBox.refreshOnClose = true;
+    CommandBox.onRunReturn("Deleted local template '" + name + "'", "");
+  }
+
+  static runSave (pArgs) {
+    const localTemplatesText = Utils.getStorageItem("local", "templates", "{}");
+    const localTemplates = JSON.parse(localTemplatesText);
+    const name = pArgs.name;
+    if (name === undefined) {
+      CommandBox._showError("Missing parameter 'name=...'");
+      return;
+    }
+    const template = {};
+    for (const key of ["targettype", "target", "command", "description"]) {
+      if (key in pArgs) {
+        template[key] = pArgs[key];
+      }
+    }
+    localTemplates[name] = template;
+    Utils.setStorageItem("local", "templates", JSON.stringify(localTemplates));
+    CommandBox.refreshOnClose = true;
+    CommandBox.onRunReturn("Saved local template '" + name + "'", "");
+
+    // revert to the command that the user was saving
+    CommandBox._applyTemplate(template);
   }
 }

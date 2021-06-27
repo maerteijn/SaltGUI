@@ -116,7 +116,7 @@ export class TargetType {
 
   static setTargetType (pTargetType) {
     TargetType.menuTargetType._value = pTargetType;
-    TargetType.menuTargetType._system = true;
+    TargetType.menuTargetType._system = false;
     TargetType._updateTargetTypeText();
   }
 

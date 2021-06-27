@@ -87,6 +87,26 @@ export class JobPanel extends Panel {
     return true;
   }
 
+  static getArgumentText (pName, pValue) {
+    let arg = " ";
+
+    if (pName) {
+      arg += pName + "=";
+    }
+
+    if (pValue === undefined) {
+      arg += "\"\"";
+    } else if (typeof pValue === "string" &&
+        ParseCommandLine.getPatJid().test(pValue)) {
+      // prevent quotes being added on JIDs
+      arg += pValue;
+    } else {
+      arg += JSON.stringify(pValue);
+    }
+
+    return arg;
+  }
+
   static decodeArgumentsText (rawArguments) {
 
     if (rawArguments === undefined) {

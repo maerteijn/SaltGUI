@@ -30,7 +30,7 @@ export class ParseCommandLine {
 
   static parseCommandLine (pToRun, pArgsArray, pArgsObject) {
 
-    const patPlaceHolder = /^<[a-z]+>/;
+    const patPlaceHolder = /^"?<[a-z]+>"?/;
 
     // note that "none" is not case-insensitive, but "null" is
     const patNull = /^(?:None|null|Null|NULL)$/;
@@ -64,7 +64,7 @@ export class ParseCommandLine {
       }
 
       if (patPlaceHolder.test(pToRun)) {
-        const placeHolder = pToRun.replace(/>.*/, ">");
+        const placeHolder = pToRun.replace(/.*</, "<").replace(/>.*/, ">");
         return "Must fill in all placeholders, e.g. " + placeHolder;
       }
 
