@@ -1,7 +1,7 @@
 /* global console document Hilitor window */
 
 import {Character} from "./Character.js";
-import {DropDownMenu} from "./DropDown.js";
+import {DropDownMenuCheckbox} from "./DropDownCheckbox.js";
 
 export class Utils {
 
@@ -200,7 +200,7 @@ export class Utils {
 
     const menuAndFieldDiv = Utils.createDiv("search-menu-and-field", "");
 
-    const searchOptionsMenu = new DropDownMenu(menuAndFieldDiv);
+    const searchOptionsMenu = new DropDownMenuCheckbox(menuAndFieldDiv);
 
     const input = document.createElement("input");
     input.type = "text";
@@ -217,15 +217,15 @@ export class Utils {
     errorDiv.style.display = "none";
     div.append(errorDiv);
 
-    searchOptionsMenu.addMenuItem(
+    searchOptionsMenu.addMenuItemCheckbox(
       "Case sensitive", (ev) => {
         Utils._updateSearchOption(ev, pTable, searchOptionsMenu, input);
       });
-    searchOptionsMenu.addMenuItem(
+    searchOptionsMenu.addMenuItemCheckbox(
       "Regular expression", (ev) => {
         Utils._updateSearchOption(ev, pTable, searchOptionsMenu, input);
       });
-    searchOptionsMenu.addMenuItem(
+    searchOptionsMenu.addMenuItemCheckbox(
       "Invert search", (ev) => {
         Utils._updateSearchOption(ev, pTable, searchOptionsMenu, input);
       });

@@ -1,20 +1,21 @@
 /* global console document */
 
 import {Character} from "./Character.js";
-import {DropDownMenu} from "./DropDown.js";
+import {DropDownMenuRadio} from "./DropDownRadio.js";
 import {Utils} from "./Utils.js";
 
 export class TargetType {
 
   static createMenu () {
     const targetbox = document.getElementById("target-box");
-    TargetType.menuTargetType = new DropDownMenu(targetbox);
+    TargetType.menuTargetType = new DropDownMenuRadio(targetbox);
     // do not show the menu title at first
-    TargetType.menuTargetType.addMenuItem("Normal", this._manualUpdateTargetTypeText, "glob");
-    TargetType.menuTargetType.addMenuItem("List", this._manualUpdateTargetTypeText, "list");
-    TargetType.menuTargetType.addMenuItem(TargetType._targetTypeNodeGroupPrepare, this._manualUpdateTargetTypeText, "nodegroup");
-    TargetType.menuTargetType.addMenuItem("Compound", this._manualUpdateTargetTypeText, "compound");
-    TargetType.setTargetTypeDefault();
+    TargetType.menuTargetType.setTitle("");
+    TargetType.menuTargetType.addMenuItemRadio("glob", "Normal");
+    TargetType.menuTargetType.addMenuItemRadio("list", "List");
+    TargetType.menuTargetType.addMenuItemRadio("nodegroup", (pMenuItem) => TargetType._targetTypeNodeGroupPrepare(pMenuItem));
+    TargetType.menuTargetType.addMenuItemRadio("compound", "Compound");
+    TargetType.autoSelectTargetType("");
   }
 
   // It takes a while before we known the list of nodegroups
@@ -85,46 +86,34 @@ export class TargetType {
       }
       menuItems[i].innerText = menuItemText;
     }
+    return null;
   }
 
   static autoSelectTargetType (pTarget) {
-
-    if (!TargetType.menuTargetType._system) {
-      // user has selected the value, do not touch it
-      return;
-    }
 
     if (pTarget.includes("@") || pTarget.includes(" ") ||
       pTarget.includes("(") || pTarget.includes(")")) {
       // "@" is a strong indicator for compound target
       // but "space", "(" and ")" are also typical for compound target
-      TargetType.menuTargetType._value = "compound";
+      TargetType.menuTargetType.setDefaultValue("compound");
     } else if (pTarget.includes(",")) {
       // "," is a strong indicator for list target (when it is also not compound)
-      TargetType.menuTargetType._value = "list";
+      TargetType.menuTargetType.setDefaultValue("list");
     } else if (pTarget.startsWith("#")) {
       // "#" at the start of a line is a strong indicator for nodegroup target
       // this is not a SALTSTACK standard, but our own invention
-      TargetType.menuTargetType._value = "nodegroup";
+      TargetType.menuTargetType.setDefaultValue("nodegroup");
     } else {
-      TargetType.menuTargetType._value = "glob";
+      TargetType.menuTargetType.setDefaultValue("glob");
     }
-
-    // show the new title
-    TargetType._updateTargetTypeText();
   }
 
   static setTargetType (pTargetType) {
-    TargetType.menuTargetType._value = pTargetType;
-    TargetType.menuTargetType._system = true;
-    TargetType._updateTargetTypeText();
+    TargetType.menuTargetType.setValue(pTargetType);
   }
 
   static _getTargetType () {
-    const targetType = TargetType.menuTargetType._value;
-    if (targetType === undefined || targetType === "") {
-      return "glob";
-    }
+    const targetType = TargetType.menuTargetType.getValue();
     return targetType;
   }
 
