@@ -7,7 +7,7 @@ export class EventsPage extends Page {
 
   constructor (pRouter) {
     // don't use /events for the page, that url is reserved
-    super("eventsview", "Events", "page-events", "button-events", pRouter);
+    super("eventsview", "Events", "button-events", pRouter);
 
     this.events = new EventsPanel();
     super.addPanel(this.events);

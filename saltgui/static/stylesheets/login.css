@@ -1,19 +1,7 @@
-#page-login {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  background-color: #263238;
-  position: absolute;
-  height: 100%;
-  top: 0;
-}
-
 #login-panel {
-  align-self: center;
-  background-color: white;
   padding: 0 50px;
-  box-shadow: 0 0 24px rgba(0, 0, 0, 0.7);
-  border-radius: 2px;
+  border-radius: 20px;
+  margin-top: 50px;
 }
 
 #login-panel h1 {

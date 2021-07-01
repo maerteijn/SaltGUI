@@ -1,6 +1,5 @@
 /* global */
 
-import {JobsSummaryPanel} from "../panels/JobsSummary.js";
 import {Page} from "./Page.js";
 import {ReactorsPanel} from "../panels/Reactors.js";
 import {Utils} from "../Utils.js";
@@ -8,16 +7,11 @@ import {Utils} from "../Utils.js";
 export class ReactorsPage extends Page {
 
   constructor (pRouter) {
-    super("reactors", "Reactors", "page-reactors", "button-reactors", pRouter);
+    super("reactors", "Reactors", "button-reactors", pRouter);
 
     this.reactors = new ReactorsPanel();
     super.addPanel(this.reactors);
-    this.jobs = new JobsSummaryPanel();
-    super.addPanel(this.jobs);
-  }
-
-  handleSaltJobRetEvent (pData) {
-    this.jobs.handleSaltJobRetEvent(pData);
+    this.addJobsSummaryPanel();
   }
 
   static isVisible () {

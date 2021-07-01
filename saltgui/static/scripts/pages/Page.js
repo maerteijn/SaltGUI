@@ -1,26 +1,13 @@
 /* global */
 
-import {Utils} from "../Utils.js";
+import {JobsSummaryPanel} from "../panels/JobsSummary.js";
 
 export class Page {
 
-  constructor (pPath, pPageName, pPageSelector, pMenuItemSelector, pRouter) {
+  constructor (pPath, pPageName, pMenuItemSelector, pRouter) {
     this.path = pPath;
     this.name = pPageName;
 
-    // <div class='route' id='page-keys'>
-    //   <div class='dashboard'>
-    //     <div class='panel minion-list'>
-    let div = document.getElementById(pPageSelector);
-    if (div === null) {
-      const route = Utils.createDiv("route", "", pPageSelector);
-      const dashboard = Utils.createDiv("dashboard");
-      route.append(dashboard);
-      const routeContainer = document.getElementById("route-container");
-      routeContainer.append(route);
-      div = route;
-    }
-    this.pageElement = div;
     this.router = pRouter;
     if (pMenuItemSelector) {
       this.menuItemElement1 = pMenuItemSelector + "1";
@@ -29,6 +16,10 @@ export class Page {
 
     this.panels = [];
     this.api = pRouter.api;
+
+    if (!Page.panels) {
+      Page.panels = [];
+    }
   }
 
   static _getIpNumberPrefixes (pAllMinionsGrains) {
@@ -112,12 +103,17 @@ export class Page {
   }
 
   addPanel (pPanel) {
+    // TODO: panels no longer exclusive for a route
     pPanel.route = this;
     pPanel.router = this.router;
-    const dashboard = this.pageElement.querySelector(".dashboard");
-    dashboard.append(pPanel.div);
     pPanel.api = this.api;
+    const dashboard = document.getElementById("route-container");
+    dashboard.append(pPanel.div);
     this.panels.push(pPanel);
+    // prevent duplicate in the global list
+    // and still keep the elements in display sequence
+    Page.panels = Page.panels.filter((value) => value !== pPanel);
+    Page.panels.push(pPanel);
   }
 
   static isVisible () {
@@ -126,6 +122,25 @@ export class Page {
   }
 
   onShow () {
+    const header = document.getElementById("header");
+    const dashboard = document.getElementById("route-container");
+    if (this.constructor.name === "LoginPage") {
+      // cannot use instanceof here due to cyclic dependency
+      dashboard.style.justifyContent = "center";
+      dashboard.style.alignItems = "center";
+      header.style.display = "none";
+    } else {
+      dashboard.style.justifyContent = "initial";
+      dashboard.style.alignItems = "flex-start";
+      header.style.display = "";
+    }
+    if (this.constructor.name === "JobsPage") {
+      Page.jobs.div.style.flexBasis = "100%";
+    } else {
+      // the left panel has the default 100%
+      // therefore the ratio is 2/3 vs 1/3
+      Page.jobs.div.style.flexBasis = "50%";
+    }
     for (const panel of this.panels) {
       panel.onShow();
     }
@@ -146,5 +161,18 @@ export class Page {
       panel.clearPanel();
       panel.onShow();
     }
+  }
+
+  static handleSaltJobRetEvent (pData) {
+    if (Page.jobs) {
+      Page.jobs.handleSaltJobRetEvent(pData);
+    }
+  }
+
+  addJobsSummaryPanel () {
+    if (!Page.jobs) {
+      Page.jobs = new JobsSummaryPanel();
+    }
+    this.addPanel(Page.jobs);
   }
 }
