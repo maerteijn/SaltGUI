@@ -85,6 +85,14 @@ h1 {
   cursor: pointer;
 }
 
+.small-button {
+  display: inline-block;
+  min-width: 50px;
+  text-align: center;
+  /*background-color: yellow;*/
+  margin: 0px 5px 0px 5px;
+}
+
 .search-button {
   font-weight: bold;
   font-size: 18px;

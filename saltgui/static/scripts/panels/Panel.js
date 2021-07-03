@@ -58,6 +58,7 @@ export class Panel {
     const span = document.createElement("span");
     span.id = this.key + "-search-button";
     span.classList.add("search-button");
+    span.classList.add("small-button");
     span.innerText = Character.LEFT_POINTING_MAGNIFYING_GLASS_MONO;
     this.div.appendChild(span);
     this.searchButton = span;
@@ -66,6 +67,7 @@ export class Panel {
   addPlayPauseButton (pInitialStatus) {
     const playButton = document.createElement("span");
     playButton.innerText = Character.CH_PLAY_MONO;
+    playButton.classList.add("small-button");
     playButton.style.cursor = "pointer";
     playButton.style.fontSize = "x-large";
     playButton.style.display = pInitialStatus === "play" ? "none" : "";
@@ -74,6 +76,7 @@ export class Panel {
 
     const pauseButton = document.createElement("span");
     pauseButton.innerText = Character.CH_PAUSE_MONO;
+    pauseButton.classList.add("small-button");
     pauseButton.style.display = "none";
     pauseButton.style.cursor = "pointer";
     pauseButton.style.fontSize = "x-large";
@@ -101,6 +104,7 @@ export class Panel {
     const span = document.createElement("span");
     span.id = this.key + "-help-button";
     span.classList.add("nearly-visible-button");
+    span.classList.add("small-button");
     span.innerText = Character.BLACK_QUESTION_MARK_ORNAMENT_MONO;
     span.style.cssFloat = "right";
     span.style.cursor = "help";
@@ -113,6 +117,7 @@ export class Panel {
     const span = document.createElement("span");
     span.id = this.key + "-close-button";
     span.classList.add("nearly-visible-button");
+    span.classList.add("small-button");
     span.innerText = Character.HEAVY_MULTIPLICATION_X_MONO;
     span.style.cssFloat = "right";
     this.div.appendChild(span);
